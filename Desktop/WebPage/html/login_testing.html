@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NEFIN | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="../public/images/nefin.jpg" type="image/png" sizes="16x16">
+    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://kit.fontawesome.com/a7b0a433da.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  </head>
+
+<body>
+  <div class="login-box">
+    <img src="../public/images/user.png" class="user">
+    <h1>Login Here</h1>
+    <form>
+      <div id="input1" class="input-box">
+        <p id="word1">Username</p>
+        <i class="fa fa-user"></i>
+        <input id="username" type="text" placeholder="Enter Username" name="username" required autofocus>
+      </div>
+      <div id="input2" class="input-box">
+        <p id="word2">Password</p>
+        <i class="fa fa-lock"></i>
+        <input id="psw" type="password" placeholder="Enter Password" name="password" required>
+        <i class="fa fa-eye" onclick="toggle()"></i>
+      </div>
+      <input id="btn_enter" type="button" value="Login" onclick="loginUser()"></input>
+      <h4><a id="register-link" href="/signup">Register Now</a></h4>
+    </form>
+  </div>
+
+  <script>
+    // Password show/hide toggle
+    function toggle(){
+      var psw = document.getElementById("psw");
+      var icon = document.querySelector(".fa-eye");
+      var link = document.getElementById("link");
+
+        if(psw.type === "password"){
+            psw.type = "text";
+            icon.style.color = "black";    
+        }
+        else{
+            psw.type = "password";
+            icon.style.color = "grey";
+        }
+    }
+
+    function loginUser(){
+      var id = document.getElementById('username').value;
+      var pwd = document.getElementById('psw').value;
+      var input1 =  document.getElementById("input1").style;
+      var input2 = document.getElementById("input2").style;
+      var word1 = document.getElementById("word1").style;
+      var word2 = document.getElementById("word2").style;
+
+      if(id === "" || pwd === ""){
+        if(id === ""){
+          document.getElementById("username").placeholder = "Please enter username";
+          input1.borderBottomColor = "red";
+          //input2.borderBottomColor = "black";
+          word1.color = "red";
+          //word2.color = "black";
+          input1.transition = " 0.6s";
+          word1.transition = " 0.6s";
+        }
+        else{
+          input1.borderBottomColor = "black";
+          word1.color = "black";
+          input1.transition = " 0.6s";
+          word1.transition = " 0.6s";
+        }
+        if(pwd === ""){
+          document.getElementById("psw").placeholder = "Please enter password";
+          //input1.borderBottomColor = "black";
+          input2.borderBottomColor = "red";
+          //word1.color = "black";
+          word2.color = "red";
+          input2.transition = " 0.6s";
+          word2.transition = " 0.6s";
+        }
+        else{
+          input2.borderBottomColor = "black";
+          word2.color = "black";
+          input2.transition = " 0.6s";
+          word2.transition = " 0.6s";
+        }
+      }
+      else{
+        url = '/loginUser';
+       
+        var loginData = {
+          username: id,
+          password: pwd
+        }
+        
+        fetch(url,{
+          method: 'POST',
+          body: JSON.stringify(loginData),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        
+        .then(resp => {
+          console.log(resp);
+          if(resp.status === 400){
+            console.log('Error Detected');
+            document.getElementById('psw').value = "";
+            document.getElementById('psw').placeholder = "Password entered is invalid.";
+            input1.borderBottomColor = "black";
+            input2.borderBottomColor = "red";
+            word1.color = "black";
+            word2.color = "red";
+            word1.transition = " 0.6s";
+            word2.transition = " 0.6s";
+            alert('Wrong Password');
+          }
+          else if(resp.status === 409){
+            console.log('Error Detected');
+            document.getElementById('username').value = "";
+            document.getElementById('username').placeholder = "Username entered is invalid.";
+            input1.borderBottomColor = "red";
+            input2.borderBottomColor = "black";
+            word1.color = "red";
+            word2.color = "black";
+            word1.transition = " 0.6s";
+            word2.transition = " 0.6s";
+            alert('Wrong Username');
+          }
+          else if(resp.status === 200){
+            //console.log(resp);
+            alert('Login Successful');
+						return resp.json();
+          }
+        })
+
+        .then(data => {
+          console.log(data);
+       
+          localStorage.mongo_id = data.jwtdata.mongo_id;
+          //localStorage.jwtToken = data.jwtdata.jwtToken;
+
+          var mongo_id = data.jwtdata.mongo_id;
+          //var jwtToken = data.jwtdata.jwtToken;
+
+          //console.log("Bearer "+jwtToken);
+
+          url = '/dashboard/'+mongo_id;
+          window.location.href = url;
+          
+        })
+      }
+    };
+
+    //Trigger Enter Button
+    document.getElementById("username").addEventListener("keyup",
+    function(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      document.getElementById("btn_enter").click();
+    }
+  });
+
+    document.getElementById("psw").addEventListener("keyup",
+      function(event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById("btn_enter").click();
+      }
+    });
+
+  </script>
+
+  </body>
+</html>

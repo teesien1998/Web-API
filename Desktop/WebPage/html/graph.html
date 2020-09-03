@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NEFIN | Data</title>
+   
+    <meta http-equiv="refresh" content="420"/>
+    <link rel="icon" href="../public/images/nefin.jpg" type="image/png" sizes="16x16">
+    <link rel="stylesheet" href="../public/css/graph.css">
+    <!--FontAwesome-->
+    <script src="https://kit.fontawesome.com/a7b0a433da.js" crossorigin="anonymous"></script>
+    <!--AJAX-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!--Chartjs-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  </head>
+  
+  <body>
+    <div class="page-wrapper" class>
+      <div class="side_navbar-wrapper">
+        <ul>
+          <div class="header_title">
+            <img class="nefin" src="../public/images/nefin.png">
+          </div>
+        <div class="image">
+          <img class="userphoto" src="../public/images/user3.png">
+          <h4 id="username"></h4>
+        </div>
+          <li>
+            <a href="#" onclick="dashboard()"><i class="fas fa-pager"></i>Dashboard</a>
+          </li>
+          <li>
+            <a class="active" href="#" onclick="reload()"><i class="far fa-chart-bar"></i>Graph</a>
+          </li>
+          <li>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Log Out</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="main_content-wrapper">
+        <div class="header">
+          <button type="button" class="button_bars">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div id="date_time" class="date_time"></div>
+        </div>
+        <div class="content">
+          <div class="graph-box">
+            <canvas id="Today_Power"></canvas>
+            <canvas id="Today_Yield"></canvas>
+          </div>
+          <div class="graph-box">
+            <canvas id="Daily_Yield"></canvas>
+            <canvas id="Daily_Power"></canvas>
+          </div>
+          <div class="graph-box">
+            <canvas id="LastMonth_Yield"></canvas>
+            <canvas id="LastMonth_Power"></canvas>
+          </div>
+        </div>
+      </div>  
+    </div>
+
+    <script>
+
+      function getdata(){
+        //console.log(token);
+        url= "/graph_data";
+
+        fetch(url,{
+              method: 'GET',
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+            .then(resp => {
+                  console.log(resp);
+                  return resp.json();
+                })
+            .then(data => {
+              document.getElementById("username").innerHTML = data.name;
+              // Get Days per month
+              var date = new Date();
+              var year = date.getFullYear();
+              var month = date.getMonth()+1;
+              var last_month = date.getMonth();
+              var a = new Date(year, month, 0).getDate();
+              var b = new Date(year, last_month, 0).getDate();
+            
+              var sum_days = 0;
+              var lastsum_days = 0;
+              const days = [];
+              const lastMonth_days = [];
+
+              //Daily Yield & Power
+              for(var i = 0; i < a; i++){
+                sum_days += 1;
+                days.push(month+"/"+sum_days);
+              }
+              console.log(days);
+              const daily_yield = data.daily_data.actual_energy;
+              const daily_power = data.daily_data.plan_energy;
+              render_graph_dailyyield(daily_yield, days);
+              render_graph_dailypower(daily_power, days);
+
+
+              // Last Month Daily Yield & Power
+              for(var i = 0; i < b; i++){
+                lastsum_days += 1;
+                lastMonth_days.push(last_month+"/"+lastsum_days);
+              }
+              console.log(lastMonth_days);
+              const lastMonth_yield = data.lastMonth_daily_data.actual_energy;
+              const lastMonth_power = data.lastMonth_daily_data.plan_energy;
+              render_graph_lastMonth_dailyyield(lastMonth_yield, lastMonth_days);
+              render_graph_lastMonth_dailypower(lastMonth_power, lastMonth_days);
+
+              //Today_Yield
+              const nums = data.today_data.actual_energy.slice(6);
+              var sum = 0;
+              const today_yield = [];
+
+              for(var i = 0; i < nums.length; i++){
+                sum += parseFloat(nums[i]);
+                today_yield.push(sum);
+              }
+              //console.log(nums);
+              //console.log(today_yield);
+              render_graph_todayyield(today_yield);
+              
+              //Today Power
+              const today_power = data.today_data.plan_energy.slice(6);
+              render_graph_todaypower(today_power);
+                  
+            })
+            .catch(err => {
+                  console.error(err)
+                  console.log('ERROR!')
+            });
+      };
+      
+      getdata();
+
+      function render_graph_todaypower(today_power_data) {
+        var today_power_graph = document.getElementById("Today_Power").getContext('2d');
+        var linegraph_power = new Chart(today_power_graph, {
+            // The type of chart we want to create
+            type: 'line',
+            // The data for our dataset
+            data: {
+                labels: ['7.00 AM', '8.00AM', '9.00 AM', '10.00 AM', '11.00 AM', '12.00 PM', '1.00 PM', '2.00 PM', '3.00 PM', '4.00 PM', '5.00 PM', '6.00 PM', '7.00 PM', '8.00 PM'],
+                datasets: [{
+                    label: 'Today Power',
+                    fill: "false",
+                    backgroundColor: 'rgb(235, 138, 48)', 
+                    borderColor: 'rgb(235, 138, 48)',
+                    data: today_power_data
+                },
+                {
+                    label: 'Threshold Power Limit',
+                    fill: "false",
+                    backgroundColor: 'blue', 
+                    borderColor: 'blue',
+                    borderDash: [5, 5],
+                    data: ["0", "67.365", "208.081", "364.161", "458.003", "544.069", "605.478", "569.304", "428.978", "322.746", "219.416", "88.853", "40.335", "0"]
+                }
+              ]
+            },
+            // Configuration options go here
+            options: {
+              tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                        label: function (value, data) {
+                              return  value.yLabel + " kW";
+                        }
+                }
+              },
+              title: {
+                display: true,
+                text: 'Today Power',
+                fontSize: 18,
+              },
+              legend: {
+                  onHover: function(e) {
+                    e.target.style.cursor = 'pointer';
+                  }
+              },
+              hover: {
+                onHover: function(e) {
+                  var point = this.getElementAtEvent(e);
+                  if (point.length) e.target.style.cursor = 'pointer';
+                  else e.target.style.cursor = 'default';
+                }
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Time'
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    callback: function(value, index, values) {
+                        return value + 'kW';
+                    }
+                  },
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Power(kW)'
+                  }
+                }]
+              }
+            }
+        });
+      };
+    
+      function render_graph_todayyield(today_yield_data){
+        var today_yield_graph = document.getElementById("Today_Yield").getContext('2d');
+        var linegraph_today_yield = new Chart(today_yield_graph, {
+            type: 'bar',
+            data: {
+                labels: ['7.00 AM', '8.00AM', '9.00 AM', '10.00 AM', '11.00 AM', '12.00 PM', '1.00 PM', '2.00 PM', '3.00 PM', '4.00 PM', '5.00 PM', '6.00 PM', '7.00 PM', '8.00 PM'],
+                datasets: [{
+                    label: 'Today Power',
+                    fill: "false",
+                    backgroundColor: 'rgb(255, 99, 132)', 
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: today_yield_data
+                }]
+            },
+            // Configuration options go here
+            options: {
+              tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                        label: function (value, data) {
+                              return  value.yLabel + " kWh";
+                        }
+                }
+              },
+              title: {
+                display: true,
+                text: 'Today Yield',
+                fontSize: 18,
+              },
+              legend: {
+                  onHover: function(e) {
+                    e.target.style.cursor = 'pointer';
+                  }
+              },
+              hover: {
+                onHover: function(e) {
+                  var point = this.getElementAtEvent(e);
+                  if (point.length) e.target.style.cursor = 'pointer';
+                  else e.target.style.cursor = 'default';
+                }
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Time'
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    callback: function(value, index, values) {
+                        return value + 'kWh';
+                    }
+                  },
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Yield(kWh)'
+                  }
+                }]
+              }
+            }
+        })
+      };
+
+      function render_graph_dailyyield(daily_yield_data, days_data){
+        var daily_yield_graph = document.getElementById("Daily_Yield").getContext('2d');
+        var linegraph_daily_yield = new Chart(daily_yield_graph, {
+            type: 'bar',
+            data: {
+                labels: days_data,
+                datasets: [{
+                    label: 'Daily Yield',
+                    fill: "false",
+                    backgroundColor: 'rgb(30, 199, 185)', 
+                    borderColor: 'rgb(30, 199, 185)',
+                    data: daily_yield_data
+                }]
+            },
+            // Configuration options go here
+            options: {
+              tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                        label: function (value, data) {
+                              return  value.yLabel + " kWh";
+                        }
+                }
+              },
+              title: {
+                display: true,
+                text: ' Daily Yield (This Month)',
+                fontSize: 18,
+              },
+              legend: {
+                  onHover: function(e) {
+                    e.target.style.cursor = 'pointer';
+                  }
+              },
+              hover: {
+                onHover: function(e) {
+                  var point = this.getElementAtEvent(e);
+                  if (point.length) e.target.style.cursor = 'pointer';
+                  else e.target.style.cursor = 'default';
+                }
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Date'
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    callback: function(value, index, values) {
+                        return value + 'kWh';
+                    }
+                  },
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Yield(kWh)'
+                  }
+                }]
+              }
+            }
+        })
+      };
+
+      function render_graph_dailypower(daily_power_data, days_data){
+        var daily_power_graph = document.getElementById("Daily_Power").getContext('2d');
+        var linegraph_daily_power = new Chart(daily_power_graph, {
+            type: 'bar',
+            data: {
+                labels: days_data,
+                datasets: [{
+                    label: 'Daily Yield',
+                    fill: "false",
+                    backgroundColor: 'rgb(235, 138, 48)', 
+                    borderColor: 'rgb(235, 138, 48)',
+                    data: daily_power_data
+                }]
+            },
+            // Configuration options go here
+            options: {
+              tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                        label: function (value, data) {
+                              return  value.yLabel + " kW";
+                        }
+                }
+              },
+              title: {
+                display: true,
+                text: ' Daily Power (This Month)',
+                fontSize: 18,
+              },
+              legend: {
+                  onHover: function(e) {
+                    e.target.style.cursor = 'pointer';
+                  }
+              },
+              hover: {
+                onHover: function(e) {
+                  var point = this.getElementAtEvent(e);
+                  if (point.length) e.target.style.cursor = 'pointer';
+                  else e.target.style.cursor = 'default';
+                }
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Date'
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    callback: function(value, index, values) {
+                        return value + 'kW';
+                    }
+                  },
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Power(kW)'
+                  }
+                }]
+              }
+            }
+        })
+      };
+
+      function render_graph_lastMonth_dailyyield(lastMonth_yield_data, lastMonth_days_data){
+        var lastMonth_yield_graph = document.getElementById("LastMonth_Yield").getContext('2d');
+        var linegraph_lastMonth_yield = new Chart(lastMonth_yield_graph, {
+            type: 'bar',
+            data: {
+                labels: lastMonth_days_data,
+                datasets: [{
+                    label: 'Daily Yield',
+                    fill: "false",
+                    backgroundColor: 'rgb(26, 177, 26)', 
+                    borderColor: 'rgb(26, 177, 26)',
+                    data: lastMonth_yield_data
+                }]
+            },
+            // Configuration options go here
+            options: {
+              tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                        label: function (value, data) {
+                              return  value.yLabel + " kWh";
+                        }
+                }
+              },
+              title: {
+                display: true,
+                text: ' Daily Yield (Last Month)',
+                fontSize: 18,
+              },
+              legend: {
+                  onHover: function(e) {
+                    e.target.style.cursor = 'pointer';
+                  }
+              },
+              hover: {
+                onHover: function(e) {
+                  var point = this.getElementAtEvent(e);
+                  if (point.length) e.target.style.cursor = 'pointer';
+                  else e.target.style.cursor = 'default';
+                }
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Date'
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    callback: function(value, index, values) {
+                        return value + 'kWh';
+                    }
+                  },
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Yield(kWh)'
+                  }
+                }]
+              }
+            }
+        })
+      };
+
+      function render_graph_lastMonth_dailypower(lastMonth_power_data, lastMonth_days_data){
+        var lastMonth_power_graph = document.getElementById("LastMonth_Power").getContext('2d');
+        var linegraph_lastMonth_power = new Chart(lastMonth_power_graph, {
+            type: 'bar',
+            data: {
+                labels: lastMonth_days_data,
+                datasets: [{
+                    label: 'Daily Power',
+                    fill: "false",
+                    backgroundColor: 'rgb(99, 122, 255)', 
+                    borderColor: 'rgb(99, 122, 255)',
+                    data: lastMonth_power_data
+                }]
+            },
+            // Configuration options go here
+            options: {
+              tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                        label: function (value, data) {
+                              return  value.yLabel + " kW";
+                        }
+                }
+              },
+              title: {
+                display: true,
+                text: ' Daily Power (Last Month)',
+                fontSize: 18,
+              },
+              legend: {
+                  onHover: function(e) {
+                    e.target.style.cursor = 'pointer';
+                  }
+              },
+              hover: {
+                onHover: function(e) {
+                  var point = this.getElementAtEvent(e);
+                  if (point.length) e.target.style.cursor = 'pointer';
+                  else e.target.style.cursor = 'default';
+                }
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Date'
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    callback: function(value, index, values) {
+                        return value + 'kW';
+                    }
+                  },
+                  scaleLabel: {
+                    display: true,
+                    fontStyle: 'bold',
+                    labelString: 'Power(kW)'
+                  }
+                }]
+              }
+            }
+        })
+      };
+
+      function date_time(){
+        document.getElementById("date_time").innerHTML = new Date().toLocaleString();
+      };
+
+      setInterval(date_time,1000);
+      
+      function logout(){
+        url = "/logout";
+        window.location.href = url;
+        localStorage.clear();
+      };
+
+      function reload(){
+        window.location.reload();
+      };
+
+      function dashboard(){
+        var mongo_id = localStorage.getItem("mongo_id");
+        url = '/dashboard/'+mongo_id;
+        window.location.href = url;
+      }
+
+      $(".button_bars").click(function(event) {
+            event.preventDefault();
+            $(".page-wrapper").toggleClass("toggled");
+        });
+
+
+      /*elements: {
+            point:{
+              pointStyle: 'cross',
+            },
+            line: {
+                tension: 1
+            }
+          },*/
+      //$(document).ready(function() { });
+      //document.onload = function(){
+      //use session store user info (token, appkey)
+      //authorize token
+      //get userid
+      //with userid, token and appkey, generate url
+      //call url
+      //get data in json format, insert data into html element and display out to user
+  
+    </script>
+  </body>
+</html>
+

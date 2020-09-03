@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NEFIN | Data</title>
+    <meta http-equiv="refresh" content="420"/>
+    <link rel="icon" href="../public/images/nefin.jpg" type="image/png" sizes="16x16">
+    <link rel="stylesheet" href="../public/css/navstyle.css">
+    <!--FontAwesome-->
+    <script src="https://kit.fontawesome.com/a7b0a433da.js" crossorigin="anonymous"></script>
+    <!--AJAX-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <div class="page-wrapper" class>
+      <div class="side_navbar-wrapper">
+        <ul>
+          <div class="header_title">
+            <img class="nefin" src="../public/images/nefin.png">
+          </div>
+        <div class="image">
+          <img class="userphoto" src="../public/images/user3.png">
+          <h4 id="username"></h4>
+        </div>
+          <li>
+            <a class="active" href="#" onclick="reload()"><i class="fas fa-pager"></i>Dashboard</a>
+          </li>
+          <li>
+            <a href="#" onclick="graph()"><i class="far fa-chart-bar"></i>Graph</a>
+          </li>
+          <li>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Log Out</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="main_content-wrapper">
+        <div class="header">
+          <button type="button" class="button_bars">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div id="date_time" class="date_time"></div>
+        </div>
+        <div class="content">
+          <div class= "data-box">
+            <div class="title_box">
+              <img class="pic_icon" src="../public/images/pic1.png">
+              <span class="title_value">Real-time Power</span>
+              <div class="title_line"></div>
+            </div>
+            <div>
+              <span id="current_power" class="value"></span>
+              <span class="unit">W</span>
+            </div>
+            <div class="total_value">
+              <span class="title_totalvalue">Installed Power</span>
+              <span id="total_capacity" class="total_value"></span>
+              <span>kWp</span>
+            </div>
+          </div>
+          <div class='data-box'>
+            <div class="title_box">
+              <img class="pic_icon" src="../public/images/pic2.png">
+              <span class="title_value">Today Yield</span>
+              <div class="title_line"></div>
+            </div>
+            <div>
+              <span id="today_energy" class="value"></span>
+              <span class="unit">MWh</span>
+            </div>
+            <div class="total_value">
+              <span class="title_totalvalue">Total Yield</span>
+              <span id="total_energy" class="total_value"></span>
+              <span>GWh</span>
+            </div>
+          </div>
+          <div class= "data-box">
+            <div class="title_box">
+              <img class="pic_icon" src="../public/images/pic4.png">
+              <span class="title_value">CO2 Reduction</span>
+              <div class="title_line"></div>
+            </div>
+            <div>
+              <span id="co2_reduce" class="value"></span>
+              <span class="unit">kg</span>
+            </div>
+            <div class="total_value">
+              <span class="title_totalvalue">Total Saving</span>
+              <span id="total_co2_reduce" class="total_value"></span>
+              <span>kg</span>
+            </div>
+          </div>
+          <div class='data-box'>
+            <div class="title_box">
+              <img class="pic_icon" src="../public/images/pic3.png">
+              <span class="title_value">Tree</span>
+              <div class="title_line"></div>
+            </div>
+            <div>
+              <span id="tree" class="value"></span>
+              <span class="unit">trees</span>
+            </div>
+            <div class="total_value">
+              <span class="title_totalvalue">Accumulated Equivalent Trees</span>
+              <span id="total_tree" class="total_value"></span>
+              <span>trees</span>
+            </div>
+          </div>  
+          <div class='data-box'>
+            <div class="title_box">
+              <img class="pic_icon" src="../public/images/pic5.png">
+              <span class="title_value">Income</span>
+              <div class="title_line"></div>
+            </div>
+            <div>
+              <span id="today_income" class="value"></span>
+              <span class="unit">RM</span>
+            </div>
+            <div class="total_value">
+              <span class="title_totalvalue">Total Income</span>
+              <span>RM</span>
+              <span id="total_income" class="total_value"></span>
+            </div>
+          </div> 
+        </div>
+      </div>  
+    </div>
+
+    <div id="modal_box" class="modal">
+      <div class="modal_content">
+        <div class="modal_header">
+          <span class="close" id="close">&times;</span>
+          <h3><i class="fas fa-exclamation-triangle"></i>Warning!!</h3>  
+        </div>
+        <div class="alert alert-danger" role="alert" id="register-message-error"></div>
+      </div>
+    </div>
+
+    <script>
+
+      function getdata(){
+        //console.log(token);
+        url= "/dashboard_data";
+
+        fetch(url,{
+              method: 'GET',
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+            .then(resp => {
+                  console.log(resp);
+                  return resp.json();
+                })
+            .then(data => {
+                  console.log(data);
+                  // Calculation
+                  var num_energy = parseFloat(data.data_values.total_energy.value)/1e2;
+                  var total_energy = num_energy.toFixed(3);
+                  var num_trees = (parseFloat(data.data_values.today_energy.value)/1e3*1e6)*(54.48*1e-6);;
+                  var tree = num_trees.toFixed(3);
+                  var num_totaltrees = (total_energy*1e9)*(54.48*1e-6);
+                  var totaltrees = num_totaltrees.toFixed();
+                  //var total_energy = parseFloat(data.data_values.total_energy.value)/1e2;
+                  //Display Data
+                  document.getElementById("current_power").innerHTML = data.data_values.curr_power.value;
+                  document.getElementById("total_capacity").innerHTML = data.data_values.total_capcity.value;
+                  document.getElementById("today_energy").innerHTML = parseFloat(data.data_values.today_energy.value)/1e3;
+                  document.getElementById("total_energy").innerHTML = total_energy;
+                  document.getElementById("co2_reduce").innerHTML = data.data_values.co2_reduce.value;
+                  document.getElementById("total_co2_reduce").innerHTML = data.data_values.co2_reduce_total.value;          
+                  document.getElementById("tree").innerHTML = tree;
+                  document.getElementById("total_tree").innerHTML = totaltrees;
+                  document.getElementById("today_income").innerHTML = data.data_values.today_income.value;
+                  document.getElementById("total_income").innerHTML = data.data_values.total_income.value + "万";
+                  document.getElementById("username").innerHTML = data.name;
+                  //Error Detect
+                  const current_power_error = data.data_values.curr_power.value;
+                  error(current_power_error);
+            })
+            .catch(err => {
+                  console.error(err)
+                  console.log('ERROR!')
+            });
+      };
+      
+      getdata();
+
+      function date_time(){
+        document.getElementById("date_time").innerHTML = new Date().toLocaleString();
+      };
+
+      setInterval(date_time,1000);
+
+      //Error Detected
+      function error(error_current_power){
+        var today = new Date().getHours();
+        if (today >= 8 && today <= 18){
+          if(error_current_power == 0){
+          document.getElementById("modal_box").style.display = "block";
+          document.getElementById("register-message-error").innerHTML = "Warning!! Real-Time Power has exceeded the limit. Please check and see.";
+          }
+        } 
+        else{
+           document.getElementById("modal_box").style.display = "none";
+        }
+      };
+
+      document.getElementById("close").onclick = function(){
+        document.getElementById("modal_box").style.display = "none";
+      };
+
+      function logout(){  
+        url = "/logout";
+        window.location.href = url;
+        localStorage.clear();
+      };
+
+      function reload(){
+        window.location.reload();
+      };
+
+      function graph(){
+        var mongo_id = localStorage.getItem("mongo_id");
+        url = '/graph/'+mongo_id;
+        window.location.href = url;
+      }
+
+      $(".button_bars").click(function(event) {
+            event.preventDefault();
+            $(".page-wrapper").toggleClass("toggled");
+      });
+
+      //$(document).ready(function() { });
+      //document.onload = function(){
+      //use session store user info (token, appkey)
+      //authorize token
+      //get userid
+      //with userid, token and appkey, generate url
+      //call url
+      //get data in json format, insert data into html element and display out to user
+  
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,164 @@
+
+<html>
+	<head>
+		<title>NEFIN | Sign Up</title>
+		<link rel="icon" href="../public/images/nefin.jpg" type="image/png" sizes="16x16">
+		<link rel="stylesheet" type="text/css" href="../public/css/signupstyle.css">
+		<!--bootstrap-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Raleway:wght@500&display=swap" rel="stylesheet">
+	</head>
+
+	<body>
+		<div class="register_wrapper">
+			<div class="register_container">
+				<div class="register-box">
+					<h3 id="register-title">Sign up</h3>
+					<form>
+						<div class="register-element">
+							<span id="register-name">Name: </span>
+							<input type="text" id="name-register" required>
+						</div>
+						<div class="register-element">
+							<span id="register-username">Username: </span>
+							<input type="text" id="username-register" required>
+						</div>
+						<div class="register-element">
+							<span id="register-password">Password: </span>
+							<input type="password" id="password-register" required>
+						</div>
+						<div class="register-element">
+							<span id="register-password">Confirm Password: </span>
+							<input type="password" id="confirm-password-register" required>
+						</div>
+						<div class="register-message-container">
+							<div class="alert alert-danger" role="alert" id="register-message-error"></div>
+							<div class="alert alert-success" role="alert" id="register-message-success"></div>
+						</div>
+						<div class="register-element " id ="register-navigation">
+							<a id="login-link" href="/" >Back to Login</a>
+							<button id="btn_enter" class="button_effect" type="button" onclick="register()" class="btn btn-primary">Submit</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			function register(){
+				var nameInput = document.getElementById('name-register').value;
+				var usernameInput = document.getElementById('username-register').value;
+				var passwordInput = document.getElementById('password-register').value;
+				var confirmpasswordInput = document.getElementById('confirm-password-register').value;
+				var message_error = document.getElementById('register-message-error');
+				var message_success= document.getElementById('register-message-success');
+				var message_container = document.getElementById('register-message-container');
+				
+				if(nameInput === "" ||  usernameInput === ""|| passwordInput === "" || confirmpasswordInput === ""){
+					message_error.innerHTML = "Please fill in your personal details to register.";
+					message_error.style.display = "block";
+					message_success.style.display = "none";
+					document.getElementById("register-navigation").style.padding = "10px 0px";
+				}
+				else{
+					message_error.innerHTML = "";
+					message_error.style.display = "none";
+					message_success.style.display = "none";
+					document.getElementById("register-navigation").style.padding = "10px 0px";
+					
+					url = '/checkUsername/'+usernameInput;
+					
+					fetch(url)
+
+					.then(resp =>{
+						console.log(resp);
+						return resp.json();
+					})
+
+					.then(data => {		
+						result = data;
+						console.log(data);
+						if(result.length !== 0){
+							message_error.innerHTML = "Username has been registered. Please try other username.";
+							message_error.style.display = "block";
+							message_success.style.display = "none";
+							document.getElementById("register-navigation").style.padding = "10px 0px";
+							
+						}
+						else{					
+							message_error.innerHTML = "";
+							message_error.style.display = "none";
+							message_success.style.display = "none";
+							document.getElementById("register-navigation").style.padding = "10px 0px";
+						
+							if(passwordInput === confirmpasswordInput){
+								
+								var signupData = {
+									name: nameInput,
+									username: usernameInput,
+									password: passwordInput
+								}
+								
+								url = '/signupUser';
+
+								fetch(url,{
+									method: 'POST',
+									body: JSON.stringify(signupData),
+									headers: {
+										"Content-Type": "application/json"
+									}
+								})
+								message_success.innerHTML = "Successfully Registered.";
+								message_success.style.display = "block";
+								message_error.style.display = "none";
+								document.getElementById("register-navigation").style.padding = "10px 0px";
+							}
+							else{
+								message_error.innerHTML = "Password and Confirm Password must be same.";
+								message_error.style.display = "block";
+								message_success.style.display = "none";
+								document.getElementById("register-navigation").style.padding = "10px 0px";
+							}
+						}
+					})
+				}
+			};
+
+			document.getElementById("name-register").addEventListener("keyup",
+				function(event) {
+				if (event.keyCode === 13) {
+					event.preventDefault();
+					document.getElementById("btn_enter").click();
+				}
+			});
+
+			document.getElementById("username-register").addEventListener("keyup",
+				function(event) {
+				if (event.keyCode === 13) {
+					event.preventDefault();
+					document.getElementById("btn_enter").click();
+				}
+			});
+
+			document.getElementById("password-register").addEventListener("keyup",
+				function(event) {
+				if (event.keyCode === 13) {
+					event.preventDefault();
+					document.getElementById("btn_enter").click();
+				}
+			});
+
+			document.getElementById("confirm-password-register").addEventListener("keyup",
+				function(event) {
+				if (event.keyCode === 13) {
+					event.preventDefault();
+					document.getElementById("btn_enter").click();
+				}
+			});
+			
+		</script>
+
+	</body>
+</html>
+
+ 

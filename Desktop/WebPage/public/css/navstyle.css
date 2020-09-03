@@ -1,0 +1,464 @@
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f1f1f1;
+    color: rgb(68, 66, 66);
+}
+
+.page-wrapper{
+    /*width: 100%;
+    height: 100%;
+    display: flex;
+    position: fixed;*/
+    padding-left: 250px;
+    transition: all 0.5s ease;
+    overflow: hidden;
+}
+
+.page-wrapper.toggled{
+    padding-left: 0;
+}
+
+
+/*.side_navbar{
+    position: fixed;
+    height: 100%;
+    width: 200px;
+    background-color:black;
+}*/
+
+.header_title{
+    background-color:rgb(50, 55, 61);
+    line-height: 50px;
+}
+
+h2{
+    margin: 0;
+    padding: 0;
+    color: white;
+    text-align: center;
+}
+
+h4{
+    color: rgba(19, 3, 3, 0.8);
+    text-align: center;
+    font-weight: 200;   
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+}
+
+.nefin{ 
+    display: block;
+    margin: 0 auto;
+    width: 100px;
+    height: 50px;
+}
+
+.image{
+    background-color: rgb(246, 252, 252);
+    box-sizing: border-box;
+    padding-top: 20px;
+    padding-bottom: 30px;
+}
+
+.userphoto{   
+    width: 120px;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 5px; 
+    box-sizing: border-box;
+    border-radius: 50%;
+    text-align: center;
+}
+
+i{
+    margin-right: 20px;
+}
+
+.side_navbar-wrapper{
+    /*z-index: 1000;*/
+    position: fixed;
+    height: 100%;
+    width: 250px;
+    left: 250px;
+    background-color: rgb(55, 71, 79);
+    margin-left: -250px;
+    overflow: auto;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+.page-wrapper.toggled .side_navbar-wrapper {
+    width: 0;
+}
+
+#username{
+    font-weight: bold;
+}
+
+/*#sidebar {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 250px;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: #37474F;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}*/
+
+ul{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    width: 250px;
+    position: absolute;
+    display: block;
+    overflow: auto;
+}
+
+/*.side_navbar li{
+    
+    text-decoration: none;
+    padding: 8px 16px;
+    border: 1px solid rgba(255,255,255,0.3);
+}*/
+
+.side_navbar-wrapper li a{
+    display: block;
+    text-decoration: none;
+    color: rgba(255,255,255,0.5);
+    padding: 15px 30px;
+    border-bottom: 1px solid rgb(222, 226, 230,0.2); 
+}
+
+.side_navbar-wrapper li a.active{
+    color: rgb(255, 255, 255);
+}
+
+.side_navbar-wrapper li a:hover{
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    background-color: rgb(47, 137, 252);
+    transition: 0.4s; 
+}
+
+.main_content-wrapper{
+    width: 100%;
+    position: relative;
+    margin-right: 0;
+    /*border: 1px solid red;*/
+    
+}
+
+.page-wrapper.toggled .main_content-wrapper{
+    position: relative;
+    margin-right: 0;
+}
+
+.header{
+    width: 100%;
+    background-color: white;
+    position: relative;
+    min-height: 45px;
+    margin-bottom: 20px;
+    border: 1px solid #bbb5b5;
+    border-radius: 3px;
+}
+
+.button_bars{
+    display: inline-block;
+    background-color: rgb(55, 71, 79);
+    border: 1px solid rgb(55, 71, 79);
+    color:  rgba(255,255,255,0.5);
+    border-radius: 3px;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.fa-bars{
+    padding: 0;
+    text-align: center;
+    margin: 5px 2px;
+    display: inline-block;    
+}
+
+.button_bars:hover{
+    color: rgb(255, 255, 255);
+    transition: 0.4s;
+    background-color: rgb(47, 137, 252);
+    border: 1px solid  rgb(47, 137, 252);
+}
+
+.content{
+    position: relative;
+    padding-right: 50px;
+    padding-left: 50px;
+    margin: auto;
+    width: auto;
+    height: 100%;
+    text-align: center;
+}
+
+.data-box{
+    /*border: 1px solid red;*/
+    position: relative;
+    display: inline-block;
+    width: 35%;
+    height: 100%;
+    margin: 40px 85px;
+    padding: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+}
+
+.pic_icon{
+    display: block;
+    width: 60px;
+    height: 60px;
+    margin: 0; 
+    padding-bottom: 7px;
+    margin: auto;
+}
+
+/*span{
+    line-height: 1.0;
+}*/
+
+.title_box{
+    margin-bottom: 18px;
+}
+
+.title_value{
+    font-size: 19px;
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+    background: #ffffff;
+    padding: 0 10px;
+}
+
+.title_line {
+    height: 1.5px;
+    width: 100%;
+    position: relative;
+    z-index: 0;
+    background: #e0e0e0;
+    margin: 0 auto;
+    margin-top: -15px;
+}
+
+.value{
+    font-size: 50px;
+    display: block;
+    font-weight: bold;
+}
+
+.total_value{
+   margin-top: 5px;
+   line-height: 1.3;
+   color: #666;
+   font-size: 20px;
+   font-weight: 500;
+}
+
+.title_totalvalue{
+    display: block;
+    font-size: 13px;
+}
+
+i{
+    font-style: normal; 
+}
+
+.date_time{
+    font-weight: 600;
+    position: relative;
+    float: right;
+    margin: 14px;
+}
+
+.modal {
+    display: none;
+    position: fixed; /* Stay in place */
+    z-index: 2; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal_content{
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    position: relative;
+    width: 50%;
+    margin: auto;
+    font-weight: bold;
+    border-radius: 4px;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    /*display: none;*/
+}
+
+.modal_header{
+    padding: 1px 15px;
+    border-bottom: 1.5px solid #f5bbc1;
+}
+
+.fa-exclamation-triangle{
+    margin: 0;
+    margin: 0 15px 0 6px;
+}   
+
+.alert{
+    padding: 18px 15px;
+}
+
+.close{
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover, .close:focus{
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+#current_power{
+    color: rgb(207, 7, 7);
+}
+
+#today_energy{
+    color: rgb(223, 119, 21);
+}
+
+#co2_reduce{
+    color: rgb(30, 199, 185);
+}
+
+#tree{
+    color: rgb(26, 177, 26);
+}
+
+#today_income{
+    color: rgb(101, 35, 121);
+}
+
+@media(max-width:1510px){
+    .page-wrapper{
+        padding-left: 0px;
+        overflow: hidden;
+    }
+
+    .page-wrapper.toggled{
+        padding-left: 250px;
+    }
+
+    .side_navbar-wrapper{
+        width: 0;
+    }
+
+    .page-wrapper.toggled .side_navbar-wrapper{
+        width: 250px;
+    }
+
+    .main_content-wrapper{
+        position: absolute;
+        margin-right: 0;
+        
+    }
+    
+    .page-wrapper.toggled .main_content-wrapper{
+        position: absolute;
+        margin-right: 0;
+    }
+    
+    .data-box{
+        position: block;
+        margin: 40px 85px;
+        padding: 16px;
+    }
+}
+
+
+@media(max-width:1350px){
+    .data-box{
+        margin: 40px 75px;
+        padding: 16px;
+    }
+}
+
+@media(max-width:1200px){
+    .data-box{
+        margin: 40px 70px;
+        padding: 16px;
+    }
+}
+
+@media(max-width:1100px){
+    .data-box{
+        margin: 40px 60px;
+        padding: 16px;
+    }
+}
+
+@media(max-width:920px){
+    .data-box{
+        margin: 40px 50px;
+        padding: 15px;
+    }
+ 
+}
+
+
+@media (max-width: 790px){
+    .data-box{
+        margin: 40px 40px;
+        padding: 15px;
+    }
+    .value{
+        font-size: 40px;
+    }
+}
+
+/*padding: 10px;
+  margin: 0px;
+    
+/*<div class= "data-box">
+<p>
+  Current Power
+</p>
+<p id="current">50</p>
+</div>
+<div class= "data-box">
+<p>
+  CO2 reduction
+ <p id="current">100</p>
+</div>*/
